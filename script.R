@@ -111,63 +111,29 @@ cat_data[,] <- lapply(cat_data[,], as.factor)
 # Features: Open, High, Low, Volume
 # Reading: http://scg.sdsu.edu/ctrees_r/ 
 require('tree')
+
 custom_control = tree.control(nrow(cat_data), mincut = 5, minsize = 10, mindev = 0.01)
+
 tr <- tree(Close ~ Open + High + Low + Volume, data=cat_data, split="gini", control= custom_control)
+
 plot(tr); text(tr);
 summary(tr);
 
-cv.tree(tr, method="misclass");
-
-pr <- prune.misclass(tr);
-
-tr2 <- prune.misclass(tr, k = 0.25);
-
-plot(tr2); text(tr2);
-summary(tr2);
-
-
-fpreds = predict.tree(tr, newdata=cat_data, type="class")
+fpreds = predict(tr, newdata=cat_data, type="class")
 ftable = table(actual=cat_data$Close, fpreds)
 ftable
 
-# 
-# # Load library for decision tree
-# require('rpart')
-# require('rpart.plot') # for plotting the decision tree
-# 
-# # Parameters, TODO: TWEAK THIS
-# custom_control = rpart.control(minsplit = 16, minbucket=8, cp = 0.005, maxdepth = 30)
-# 
-# 
-# # Construct tree
-# fit <- rpart(Close ~ Open + High + Low + Volume, data=cat_data, method="class", control=custom_control)
-# 
-# printcp(fit) # display the results
-# plotcp(fit) # visualize cross-validation results
-# summary(fit) # detailed summary of splits
-# 
-# # Confusion matrix
-# fpreds = predict(fit, newdata=cat_data, type="class")
-# ftable = table(actual=cat_data$Close, fpreds)
-# ftable
-# 
-# # plot tree
-# prp(fit, type=3, extra=102)
-# 
-# 
-# 
-# 
-# # Prune tree, TODO: TWEAK THIS TOO
-# fit2 <- prune(fit, cp = 0.03)
-# 
-# # plot tree
-# prp(fit2, type=3, extra=102)
-# 
-# printcp(fit2) # display the results
-# plotcp(fit2) # visualize cross-validation results
-# summary(fit2) # detailed summary of splits
-# 
-# # Confusion matrix
-# fpreds = predict(fit2, newdata=cat_data, type="class")
-# ftable = table(actual=cat_data$Close, fpreds)
-# ftable
+
+
+cv.tree(tr, method="misclass");
+pr <- prune.misclass(tr);
+
+
+tr2 <- prune.misclass(tr, k = .2);
+plot(tr2); text(tr2);
+summary(tr2);
+
+fpreds = predict(tr2, newdata=cat_data, type="class")
+ftable = table(actual=cat_data$Close, fpreds)
+ftable
+
